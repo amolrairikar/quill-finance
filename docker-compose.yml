@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-container
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    env_file:
+      - ./.env
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  redis:
+    image: redis:alpine
+    container_name: redis-container
+    volumes:
+      - ./redis_data:/data
+    env_file:
+      - ./.env
+    ports:
+      - "6379:6379"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  #fastapi:
+    #image: tiangolo/uvicorn-gunicorn-fastapi:python3.9
+    #container_name: fastapi-container
+    #environment:
+      #DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres-container:5432/postgres
+      #REDIS_URL: redis://redis-container:6379
+    #volumes:
+      #- ./backend:/app/backend
+    #ports:
+      #- "8000:8000"
+    #depends_on:
+      #- postgres
+      #- redis
+    #restart: always
+    #healthcheck:
+      #test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
+      #interval: 10s
+      #timeout: 5s
+      #retries: 3
+      #start_period: 30s
+
+  #frontend:
+    #image: node:14-alpine
+    #container_name: react-container
+    #working_dir: /app
+    #volumes:
+      #- ./frontend:/app/frontend
+      #- /app/frontend/node_modules
+    #command: ["sh", "-c", "npm install && npm start"]
+    #ports:
+      #- "3000:3000"
+    #restart: always
+    #healthcheck:
+      #test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+      #interval: 10s
+      #timeout: 5s
+      #retries: 3
+      #start_period: 30s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
