@@ -57,23 +57,25 @@ services:
       #retries: 3
       #start_period: 30s
 
-  #frontend:
-    #image: node:14-alpine
-    #container_name: react-container
-    #working_dir: /app
-    #volumes:
-      #- ./frontend:/app/frontend
-      #- /app/frontend/node_modules
-    #command: ["sh", "-c", "npm install && npm start"]
-    #ports:
-      #- "3000:3000"
-    #restart: always
-    #healthcheck:
-      #test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
-      #interval: 10s
-      #timeout: 5s
-      #retries: 3
-      #start_period: 30s
+  frontend:
+    image: node:22-alpine
+    container_name: react-container
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    env_file:
+      - ./.env
+    command: ["sh", "-c", "npm install && npm start"]
+    ports:
+      - "3000:3000"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   postgres_data:
