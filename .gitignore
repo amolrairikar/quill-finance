@@ -7,3 +7,6 @@
 # Database files
 /postgres_data
 /redis_data
+
+# Node modules
+frontend/node_modules
